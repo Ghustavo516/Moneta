@@ -1,7 +1,20 @@
-from scrapper.market_info_extractor import MarketInfoExtractor
+from fastapi import FastAPI
 
-finance = MarketInfoExtractor()
-info_finance = finance.get_market_data('ITUB4')
-print(info_finance)
+from Moneta.model.stocks_model import StocksModel
+from Moneta.scrapper.market_info_extractor import MarketInfoExtractor
 
-# [] formatar os valores de acordo com os atribuitos e deixar pronto para o proximo passo
+app = FastAPI()
+@app.post("/moneta-by-name")
+async def get_info_finance_market(model: StocksModel):
+    finance = MarketInfoExtractor()
+    info_finance = finance.get_market_data(model.name_company)
+    return info_finance
+
+@app.post("/moneta-by-name-ticket")
+async def get_info_finance_market(model: StocksModel):
+    finance = MarketInfoExtractor()
+    print(model.name_ticket)
+    info_finance = finance.get_market_data('itub4')
+    return info_finance
+
+
