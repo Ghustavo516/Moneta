@@ -3,7 +3,6 @@ import requests
 from decimal import Decimal
 from bs4 import BeautifulSoup
 from typing import Dict
-
 from pygments.lexer import words
 
 from Moneta.model.stocks_model import StocksModel
@@ -125,7 +124,7 @@ class MarketInfoExtractor:
         investor_info['pvp'] = self.formmater_value_item(pvp)
         investor_info['dy'] = self.formmater_value_item(dy)
 
-        fundamental_indicators = soup.find('div', id =  'table-indicators')
+        fundamental_indicators = soup.find('div', id = 'table-indicators')
         itens = fundamental_indicators.findAll('div', attrs={'class', 'cell'})
 
         for i in itens:
