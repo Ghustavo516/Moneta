@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 from Moneta.model.real_estate_model import RealEstateModel
 from Moneta.model.stocks_model import StocksModel
-from Moneta.scrapper.market_info_extractor import MarketInfoExtractor
+from Moneta.scrapper.stocks_scrapper import MarketInfoExtractor
 from Moneta.scrapper.real_estate_scrapper import RealEstateScrapper
 
 app = FastAPI()
