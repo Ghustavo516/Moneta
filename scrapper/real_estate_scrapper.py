@@ -1,7 +1,9 @@
 
 import requests
+from typing import Dict
 from bs4 import BeautifulSoup
 
+from Moneta.model.real_estate_model import RealEstateModel
 from Moneta.util.moneta_utils import MonetaUtils
 
 
@@ -9,6 +11,33 @@ class RealEstateScrapper():
     global headers
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
+
+    def real_estate_map(self, values: Dict[str, str]) -> RealEstateModel:
+        real_estate = RealEstateModel(
+            name_ticket = values.get("name_ticket"),
+            name_company = values.get("name_company"),
+            cotacao = values.get("cotacao"),
+            dividend_yield = values.get("dividend_yield"),
+            dividend_yield_per_year = values.get("dividend_yield_ano"),
+            pv = values.get("pv"),
+            liquidez_diaria = values.get("liquidez_diaria"),
+            razao_social = values.get("razãoSocial"),
+            cnpj = values.get("cnpj"),
+            publico_alvo = values.get("públicoAlvo"),
+            mandato = values.get("mandato"),
+            segmento = values.get("segmento"),
+            tipo_fundo = values.get("tipoDefundo"),
+            prazo_duracao = values.get("prazoDeduração"),
+            tipo_gestao = values.get("tipoDegestão"),
+            taxa_administracao = values.get("taxaDeadministração"),
+            vacancia = values.get("vacância"),
+            numero_cotistas = values.get("numeroDecotistas"),
+            cotas_emitidas = values.get("cotasEmitidas"),
+            valor_patrimonial_cota = values.get("valPatrimonialpcota"),
+            valor_patrimonial = values.get("valorPatrimonial"),
+            ultimo_rendimento = values.get("últimoRendimento")
+        )
+        return real_estate
 
     def get_real_estate_data(self, name_ticket):
         real_estate_info = {}
@@ -49,6 +78,5 @@ class RealEstateScrapper():
             value_itens = i.find('div', attrs={'class', 'value'}).get_text()
             real_estate_info[MonetaUtils.formmater_label_itens(name_itens)] = MonetaUtils.formmater_value_item(value_itens)
 
-            print(f"{name_itens} : {value_itens}")
-
-        return real_estate_info
+        real_estate_model = self.real_estate_map(real_estate_info)
+        return real_estate_model

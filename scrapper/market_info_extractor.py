@@ -1,11 +1,10 @@
-import re
 import requests
-from decimal import Decimal
 from bs4 import BeautifulSoup
 from typing import Dict
-from pygments.lexer import words
 
 from Moneta.model.stocks_model import StocksModel
+from Moneta.util.moneta_utils import MonetaUtils
+
 
 class MarketInfoExtractor:
 
@@ -64,36 +63,6 @@ class MarketInfoExtractor:
         )
         return stocks_model
 
-    def formmater_label_itens(self, name_item):
-        if not words:
-            return ""
-
-        name_item = name_item.replace(':', '')
-        formatter_word = re.sub(r'[/.()\-\']|R\$', ' ', name_item).split()
-        first_word = formatter_word[0].lower()
-        other_words = ''.join(formatter_word[1:]).lower().capitalize()
-        camel_case_text = first_word + other_words
-        return camel_case_text
-
-    def formmater_value_item(self, value_item):
-        itens = ['R$', '%']
-        for i in itens:
-            if i in value_item:
-                value_item = value_item.replace(i, '').strip()
-
-        if ',' in value_item:
-            value_item = value_item.replace(',', '.')
-
-        if not bool(re.search(r'[a-zA-Z]', value_item)) and not '.' in value_item:
-            value_item = int(value_item)
-        elif '.' in value_item and not '/' in value_item:
-            if value_item.count('.') > 1:
-                value_item = Decimal(value_item.replace('.', ''))
-            else:
-                value_item = float(value_item)
-        return value_item
-
-
     def get_market_data(self, name_ticket):
         investor_info = {}
         url = f"https://investidor10.com.br/acoes/{name_ticket}/"
@@ -116,13 +85,13 @@ class MarketInfoExtractor:
         pvp = soup.find('div', attrs={'class', '_card vp'}).find('div', class_='_card-body').get_text().strip()
         dy = soup.find('div', attrs={'class', '_card dy'}).find('div', class_='_card-body').get_text().strip()
 
-        investor_info["name_ticket"] = self.formmater_value_item(name_ticket)
-        investor_info['name_company'] = self.formmater_value_item(name_company)
-        investor_info['cotacao'] = self.formmater_value_item(cotacao)
-        investor_info['variation'] = self.formmater_value_item(variacao)
-        investor_info['pl'] = self.formmater_value_item(pl)
-        investor_info['pvp'] = self.formmater_value_item(pvp)
-        investor_info['dy'] = self.formmater_value_item(dy)
+        investor_info["name_ticket"] = MonetaUtils.formmater_value_item(name_ticket)
+        investor_info['name_company'] = MonetaUtils.formmater_value_item(name_company)
+        investor_info['cotacao'] = MonetaUtils.formmater_value_item(cotacao)
+        investor_info['variation'] = MonetaUtils.formmater_value_item(variacao)
+        investor_info['pl'] = MonetaUtils.formmater_value_item(pl)
+        investor_info['pvp'] = MonetaUtils.formmater_value_item(pvp)
+        investor_info['dy'] = MonetaUtils.formmater_value_item(dy)
 
         fundamental_indicators = soup.find('div', id = 'table-indicators')
         itens = fundamental_indicators.findAll('div', attrs={'class', 'cell'})
@@ -130,7 +99,7 @@ class MarketInfoExtractor:
         for i in itens:
             name_itens = i.find('span', attrs={'class', 'd-flex justify-content-between align-items-center'}).get_text()
             value_itens = i.find('div', attrs={'class', 'value d-flex justify-content-between align-items-center'}).find('span').get_text().strip()
-            investor_info[self.formmater_label_itens(name_itens)] = self.formmater_value_item(value_itens)
+            investor_info[MonetaUtils.formmater_label_itens(name_itens)] = MonetaUtils.formmater_value_item(value_itens)
 
         information_company = soup.find('div', id = 'table-indicators-company')
         information_cells = information_company.findAll('div', attrs={'class', 'cell'})
@@ -142,7 +111,7 @@ class MarketInfoExtractor:
                 simple_value_info = info.find('div', attrs={'class', 'detail-value'}).get_text().strip()
             else:
                 simple_value_info = info.find('span', attrs={'value'}).get_text().strip()
-            investor_info[self.formmater_label_itens(name_info)] = self.formmater_value_item(simple_value_info)
+            investor_info[MonetaUtils.formmater_label_itens(name_info)] = MonetaUtils.formmater_value_item(simple_value_info)
 
         basic_info_company = soup.find('div', id = 'data_about')
         lines_info = basic_info_company.findAll('tr')
@@ -150,7 +119,7 @@ class MarketInfoExtractor:
         for basic_info in lines_info:
             label_info = basic_info.find('td').get_text()
             value_label_info = basic_info.find('td', attrs={'class', 'value'}).get_text()
-            investor_info[self.formmater_label_itens(label_info)] = self.formmater_value_item(value_label_info)
+            investor_info[MonetaUtils.formmater_label_itens(label_info)] = MonetaUtils.formmater_value_item(value_label_info)
 
         finance_model = self.map_stocks_model(investor_info)
         return finance_model
