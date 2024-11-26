@@ -14,6 +14,7 @@ class MonetaUtils():
         first_word = formatter_word[0].lower()
         other_words = ''.join(formatter_word[1:]).lower().capitalize()
         camel_case_text = first_word + other_words
+
         return camel_case_text
 
     @staticmethod
@@ -43,13 +44,4 @@ class MonetaUtils():
         else:
             value_item = value_item.strip()
 
-        # if not bool(re.search(r'[a-zA-Z]', value_item)) and not '.' in value_item:
-        #     value_item = int(value_item)
-        # elif '.' in value_item and not '/' in value_item and not bool(re.search(r'[a-zA-Z]', value_item)):
-        #     if value_item.count('.') > 1:
-        #         value_item = Decimal(value_item.replace('.', ''))
-        #     else:
-        #         value_item = float(value_item)
-        # else:
-        #     value_item = value_item.strip()
         return value_item
